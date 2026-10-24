@@ -297,10 +297,11 @@ async function seedServices() {
 }
 
 async function seedDoctors() {
-  const existingDoctors = await db.select({ id: doctors.id }).from(doctors);
-  if (existingDoctors.length > 0) return;
+  const existing = await db.select({ name: doctors.name }).from(doctors);
+  const existingNames = new Set(existing.map((d) => d.name));
 
-  await db.insert(doctors).values([
+  // Seed additif: baris lama tidak dobel (dedup berdasarkan nama), baris baru masuk.
+  const doctorRows: (typeof doctors.$inferInsert)[] = [
     {
       name: "drg. Anindya Putri (data demo)",
       specialty: "Dokter Gigi Umum",
@@ -317,43 +318,272 @@ async function seedDoctors() {
       sortOrder: 2,
       status: "published",
     },
-  ]);
+    {
+      name: "drg. Sekar Ayu Handayani, Sp.KG (data demo)",
+      specialty: "Konservasi Gigi & Restorasi Estetika",
+      education: "PPDS Konservasi Gigi (data demo)",
+      experience: "7 tahun pengalaman (data demo)",
+      sortOrder: 3,
+      status: "published",
+    },
+    {
+      name: "drg. Bagus Prayoga, Sp.Perio (data demo)",
+      specialty: "Periodontologi",
+      education: "PPDS Periodontologi (data demo)",
+      experience: "9 tahun pengalaman (data demo)",
+      sortOrder: 4,
+      status: "published",
+    },
+    {
+      name: "dr. Citra Lestari, Sp.BM (data demo)",
+      specialty: "Bedah Mulut & Implan",
+      education: "PPDS Bedah Mulut (data demo)",
+      experience: "12 tahun pengalaman (data demo)",
+      sortOrder: 5,
+      status: "published",
+    },
+    {
+      name: "drg. Ayu Puspita (data demo)",
+      specialty: "Dokter Gigi Umum",
+      education: "S1 Kedokteran Gigi (data demo)",
+      experience: "5 tahun pengalaman (data demo)",
+      sortOrder: 6,
+      status: "published",
+    },
+  ];
+
+  const toInsert = doctorRows.filter((d) => !existingNames.has(d.name));
+  if (toInsert.length === 0) return;
+
+  await db.insert(doctors).values(toInsert);
 }
 
 async function seedArticles() {
-  const existingArticles = await db
-    .select({ id: articles.id })
-    .from(articles);
-  if (existingArticles.length > 0) return;
+  const existing = await db.select({ slug: articles.slug }).from(articles);
+  const existingSlugs = new Set(existing.map((a) => a.slug));
 
-  // Ambil id kategori untuk FK article.
-  const categoryRows = await db
+  const catRows = await db
     .select({ id: categories.id, slug: categories.slug })
     .from(categories);
-  const kebersihanId = categoryRows.find(
-    (c) => c.slug === "kebersihan-gigi"
-  )?.id;
+  const catId = (slug: string) =>
+    catRows.find((c) => c.slug === slug)?.id;
 
-  if (!kebersihanId) {
-    console.warn("Kategori 'kebersihan-gigi' tidak ditemukan — lewati artikel.");
-    return;
+  // Sumber otoritatif untuk sinyal E-E-A-T (bagian "Sumber" pada konten + schema citation).
+  const source = {
+    who: {
+      name: "WHO — Fact sheet: Oral health",
+      url: "https://www.who.int/news-room/fact-sheets/detail/oral-health",
+    },
+    fdi: { name: "FDI World Dental Federation", url: "https://www.fdiworlddental.org" },
+    pdgi: {
+      name: "PDGI (Persatuan Dokter Gigi Indonesia)",
+      url: "https://pdgi.or.id",
+    },
+    kemkes: { name: "Kementerian Kesehatan RI", url: "https://www.kemkes.go.id" },
+    medline: {
+      name: "NIH MedlinePlus — Dental Disorders",
+      url: "https://medlineplus.gov/dentaldisorders.html",
+    },
+    mouth: {
+      name: "MouthHealthy (ADA) — Oral Health Topics",
+      url: "https://www.mouthhealthy.org/all-topics-a-z",
+    },
+  };
+
+  const articleRows = [
+    {
+      slug: "cara-menjaga-kesehatan-gigi-sehari-hari",
+      title: "Cara menjaga kesehatan gigi sehari-hari",
+      excerpt:
+        "Tiga kebiasaan sederhana yang bisa membantu menjauhkan Anda dari masalah gigi dan mulut.",
+      categorySlug: "kebersihan-gigi",
+      datePublished: "2026-01-15",
+      dateModified: "2026-06-10",
+      lastReviewed: "2026-06-10",
+      authorName: "drg. Anindya Putri (data demo)",
+      authorJob: "Dokter Gigi Umum",
+      reviewerName: "drg. Raka Wijaya (data demo)",
+      reviewerJob: "Dokter Gigi",
+      seoDescription:
+        "Panduan sederhana menjaga kesehatan gigi dan mulut: menyikat, membersihkan sela gigi, dan membatasi gula.",
+      body: `<p>Menjaga kesehatan gigi tidak harus rumit. Tiga kebiasaan sederhana di bawah ini membantu menurunkan risiko gigi berlubang dan masalah gusi.</p><h2>Tiga kebiasaan utama</h2><ul><li>Menyikat gigi dua kali sehari dengan pasta gigi berfluoride.</li><li>Membersihkan sela gigi setiap hari (benang gigi atau sikat interdental).</li><li>Membatasi makanan dan minuman tinggi gula, terutama di antara waktu makan.</li></ul><h2>Jadwal pemeriksaan</h2><p>Pemeriksaan rutin membantu menemukan masalah lebih dini. Konsultasikan frekuensi yang sesuai dengan dokter gigi Anda, karena kebutuhan tiap orang berbeda.</p>`,
+      sources: [source.who, source.mouth, source.kemkes],
+    },
+    {
+      slug: "kapan-saatnya-scaling-gigi",
+      title: "Kapan Saatnya Scaling Gigi?",
+      excerpt:
+        "Kenali tanda karang gigi dan pahami seberapa sering pembersihan dianjurkan.",
+      categorySlug: "kebersihan-gigi",
+      datePublished: "2026-02-05",
+      dateModified: "2026-06-12",
+      lastReviewed: "2026-06-12",
+      authorName: "drg. Sekar Ayu Handayani, Sp.KG (data demo)",
+      authorJob: "Dokter Gigi Spesialis Konservasi Gigi",
+      reviewerName: "drg. Bagus Prayoga, Sp.Perio (data demo)",
+      reviewerJob: "Dokter Gigi Spesialis Periodontologi",
+      seoDescription:
+        "Tanda Anda mungkin membutuhkan scaling dan perkiraan interval pembersihan karang gigi berdasarkan pemeriksaan.",
+      body: `<p>Scaling (pembersihan karang gigi) membantu menghilangkan plak dan karang yang tidak dapat dibersihkan hanya dengan menyikat gigi.</p><h2>Tanda Anda mungkin membutuhkan scaling</h2><ul><li>Gusi mudah berdarah saat menyikat gigi.</li><li>Napas tidak segar berulang.</li><li>Terdapat endapan keras di sekitar leher gigi.</li></ul><h2>Seberapa sering?</h2><p>Banyak dokter gigi menyarankan pembersihan rutin, umumnya setiap enam bulan. Namun interval yang tepat bergantung pada kondisi masing-masing pasien dan hasil pemeriksaan.</p>`,
+      sources: [source.who, source.pdgi, source.medline],
+    },
+    {
+      slug: "mitos-dan-fakta-pemutihan-gigi",
+      title: "Mitos dan Fakta Pemutihan Gigi (Bleaching)",
+      excerpt:
+        "Harapan yang realistis sebelum menjalani perawatan pemutihan gigi.",
+      categorySlug: "perawatan",
+      datePublished: "2026-03-20",
+      dateModified: "2026-07-01",
+      lastReviewed: "2026-07-01",
+      authorName: "drg. Sekar Ayu Handayani, Sp.KG (data demo)",
+      authorJob: "Dokter Gigi Spesialis Konservasi Gigi",
+      reviewerName: "drg. Anindya Putri (data demo)",
+      reviewerJob: "Dokter Gigi Umum",
+      seoDescription:
+        "Penjelasan berimbang tentang pemutihan gigi: hasil bervariasi, keterbatasan, dan pentingnya pengawasan dokter gigi.",
+      body: `<p>Pemutihan gigi (bleaching) adalah perawatan estetika untuk membantu mencerahkan warna gigi. Berikut hal yang perlu diketahui agar harapan Anda realistis.</p><h2>Yang perlu dipahami</h2><ul><li>Hasil bervariasi tergantung kondisi awal gigi dan tidak bersifat permanen.</li><li>Restorasi seperti tambalan, mahkota, atau veneer umumnya tidak ikut berubah warna.</li><li>Perawatan sebaiknya dilakukan di bawah pengawasan dokter gigi, bukan produk tanpa pengawasan.</li></ul><h2>Kapan konsultasi?</h2><p>Dokter akan menilai kondisi gigi dan gusi, serta menjelaskan opsi, manfaat, dan risikonya sebelum perawatan dimulai.</p>`,
+      sources: [source.fdi, source.mouth, source.pdgi],
+    },
+    {
+      slug: "yang-perlu-diketahui-sebelum-kawat-gigi",
+      title: "Yang Perlu Diketahui Sebelum Kawat Gigi",
+      excerpt:
+        "Langkah awal dan hal yang perlu disiapkan sebelum memulai perawatan ortodonti.",
+      categorySlug: "ortodonti",
+      datePublished: "2026-04-18",
+      dateModified: "2026-07-05",
+      lastReviewed: "2026-07-05",
+      authorName: "drg. Raka Wijaya (data demo)",
+      authorJob: "Dokter Gigi Spesialis Ortodonti",
+      reviewerName: "drg. Anindya Putri (data demo)",
+      reviewerJob: "Dokter Gigi Umum",
+      seoDescription:
+        "Gambaran alur perawatan ortodonti, dari konsultasi hingga kontrol, serta catatan bahwa hasil bervariasi tiap pasien.",
+      body: `<p>Perawatan ortodonti (kawat gigi atau aligner) bertujuan membantu memperbaiki susunan gigi dan gigitan. Berikut hal yang sebaiknya disiapkan sebelum memulai.</p><h2>Langkah awal</h2><ol><li>Konsultasi dan pemeriksaan, termasuk foto dan rontgen bila diperlukan.</li><li>Pembahasan rencana perawatan, durasi, dan pilihan alat.</li><li>Perawatan bertahap dengan kontrol berkala.</li></ol><h2>Hal yang perlu diketahui</h2><p>Durasi dan hasil perawatan bervariasi pada tiap pasien dan bergantung pada penilaian dokter gigi atau dokter gigi spesialis ortodonti.</p>`,
+      sources: [source.fdi, source.pdgi, source.medline],
+    },
+    {
+      slug: "gigi-sensitif-penyebab-dan-penanganannya",
+      title: "Gigi Sensitif: Penyebab dan Penanganannya",
+      excerpt:
+        "Mengapa gigi terasa ngilu dan langkah yang dapat membantu meredakan keluhan.",
+      categorySlug: "perawatan",
+      datePublished: "2026-05-22",
+      dateModified: "2026-07-18",
+      lastReviewed: "2026-07-18",
+      authorName: "drg. Sekar Ayu Handayani, Sp.KG (data demo)",
+      authorJob: "Dokter Gigi Spesialis Konservasi Gigi",
+      reviewerName: "dr. Citra Lestari, Sp.BM (data demo)",
+      reviewerJob: "Dokter Spesialis Bedah Mulut",
+      seoDescription:
+        "Penjelasan umum penyebab gigi sensitif dan mengapa pemeriksaan diperlukan untuk menentukan penanganan yang tepat.",
+      body: `<p>Gigi sensitif umumnya terasa ngilu saat mengonsumsi makanan atau minuman panas, dingin, manis, atau asam.</p><h2>Beberapa kemungkinan penyebab</h2><ul><li>Email gigi menipis.</li><li>Leher gigi terbuka karena gusi menurun.</li><li>Retakan kecil pada gigi.</li></ul><h2>Apa yang dapat membantu</h2><p>Pasta gigi khusus gigi sensitif dapat membantu meringankan keluhan ringan. Namun penyebabnya perlu dipastikan melalui pemeriksaan agar penanganannya tepat.</p>`,
+      sources: [source.mouth, source.who, source.medline],
+    },
+    {
+      slug: "menjaga-kesehatan-gigi-anak-sejak-dini",
+      title: "Menjaga Kesehatan Gigi Anak Sejak Dini",
+      excerpt:
+        "Kebiasaan kebersihan gigi untuk anak sesuai tahapan usia.",
+      categorySlug: "keluarga",
+      datePublished: "2026-06-15",
+      dateModified: "2026-08-02",
+      lastReviewed: "2026-08-02",
+      authorName: "drg. Ayu Puspita (data demo)",
+      authorJob: "Dokter Gigi Umum",
+      reviewerName: "drg. Anindya Putri (data demo)",
+      reviewerJob: "Dokter Gigi Umum",
+      seoDescription:
+        "Tips menjaga kesehatan gigi anak sejak dini dan anjuran pemeriksaan awal ke dokter gigi.",
+      body: `<p>Kebiasaan kebersihan gigi yang dibangun sejak dini membantu menjaga kesehatan gigi permanen anak di kemudian hari.</p><h2>Tips sesuai usia</h2><ul><li>Mulai membersihkan mulut bayi bahkan sebelum gigi tumbuh.</li><li>Gunakan pasta gigi berfluoride dalam jumlah sekecil butiran beras saat gigi pertama tumbuh.</li><li>Dampingi menyikat gigi hingga anak terampil, umumnya sekitar usia 6-8 tahun.</li></ul><h2>Pemeriksaan pertama</h2><p>Pemeriksaan dini ke dokter gigi dianjurkan. Konsultasikan waktu yang paling sesuai untuk anak Anda.</p>`,
+      sources: [source.who, source.pdgi, source.kemkes],
+    },
+  ];
+
+  const origin = (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/$/, "");
+
+  const person = (name: string, jobTitle: string) => ({
+    "@type": "Person",
+    name,
+    jobTitle,
+    affiliation: { "@type": "Organization", name: "Nawasena Dental Care" },
+  });
+
+  // Sinyal E-E-A-T yang terlihat di halaman: byline penulis & peninjau, daftar
+  // sumber tepercaya, dan disclaimer edukatif (bukan pengganti konsultasi).
+  const bylineAndRefs = (a: (typeof articleRows)[number]) =>
+    `<h2>Ditulis dan ditinjau</h2><p>Disusun oleh <strong>${a.authorName}</strong> (${a.authorJob}) dan ditinjau oleh <strong>${a.reviewerName}</strong> (${a.reviewerJob}) di Nawasena Dental Care. Nama dan kredensial pada halaman demo ini bersifat fiktif.</p><h2>Sumber</h2><ul>${a.sources
+      .map(
+        (s) =>
+          `<li><a href="${s.url}" target="_blank" rel="noopener noreferrer">${s.name}</a></li>`
+      )
+      .join("")}</ul><p><em>Konten ini bersifat edukatif secara umum dan bukan pengganti diagnosis atau konsultasi dengan dokter gigi.</em></p>`;
+
+  // Data terstruktur (JSON-LD) khusus medis untuk mendukung E-E-A-T: penulis &
+  // peninjau (Person), sitasi sumber, serta tanggal terbit/modifikasi/review.
+  const buildJsonLd = (a: (typeof articleRows)[number]) => ({
+    "@context": "https://schema.org",
+    "@type": ["Article", "MedicalWebPage"],
+    inLanguage: "id",
+    ...(origin
+      ? {
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": `${origin}/artikel/${a.slug}`,
+          },
+        }
+      : {}),
+    headline: a.title,
+    description: a.seoDescription,
+    datePublished: a.datePublished,
+    dateModified: a.dateModified,
+    lastReviewed: a.lastReviewed,
+    author: person(a.authorName, a.authorJob),
+    reviewedBy: person(a.reviewerName, a.reviewerJob),
+    publisher: {
+      "@type": "Organization",
+      name: "Nawasena Dental Care",
+      ...(origin ? { url: origin } : {}),
+    },
+    relevantSpecialty: "Dental",
+    appropriateMedicalAudience: { "@type": "Patient" },
+    citation: a.sources.map((s) => ({
+      "@type": "CreativeWork",
+      name: s.name,
+      url: s.url,
+    })),
+  });
+
+  const insertRows: (typeof articles.$inferInsert)[] = [];
+  for (const a of articleRows) {
+    const categoryId = catId(a.categorySlug);
+    if (!categoryId) {
+      console.warn(
+        `Kategori '${a.categorySlug}' tidak ditemukan — lewati artikel '${a.slug}'.`
+      );
+      continue;
+    }
+    insertRows.push({
+      slug: a.slug,
+      title: a.title,
+      excerpt: a.excerpt,
+      content: `${a.body}${bylineAndRefs(a)}`,
+      categoryId,
+      status: "published",
+      publishedAt: new Date(a.datePublished),
+      isProfessionallyReviewed: true,
+      seoTitle: a.title,
+      seoDescription: a.seoDescription,
+      schemaJson: buildJsonLd(a),
+    });
   }
 
-  await db.insert(articles).values({
-    slug: "cara-menjaga-kesehatan-gigi-sehari-hari",
-    title: "Cara menjaga kesehatan gigi sehari-hari",
-    excerpt:
-      "Tiga kebiasaan sederhana yang bisa menjauhkan Anda dari masalah gigi dan mulut.",
-    content:
-      "<p>Menjaga kesehatan gigi tidak harus rumit. Ada tiga kebiasaan sederhana yang bisa Anda mulai hari ini.</p><h2>Tiga kebiasaan utama</h2><ul><li>Menyikat gigi dua kali sehari dengan pasta berfluoride.</li><li>Membersihkan sela gigi setiap hari.</li><li>Menjaga pola makan yang seimbang dan membatasi gula.</li></ul><p>Konsultasikan kondisi Anda dengan dokter gigi untuk rencana perawatan yang sesuai.</p>",
-    categoryId: kebersihanId,
-    status: "published",
-    publishedAt: new Date(),
-    isProfessionallyReviewed: true,
-    seoTitle: "Cara menjaga kesehatan gigi sehari-hari",
-    seoDescription:
-      "Panduan sederhana menjaga kesehatan gigi dan mulut agar tetap optimal.",
-  });
+  // Seed additif: artikel lama (slug sama) tidak dobel/ditimpa, yang baru masuk.
+  const toInsert = insertRows.filter((r) => !existingSlugs.has(r.slug));
+  if (toInsert.length === 0) return;
+
+  await db.insert(articles).values(toInsert);
 }
 
 async function seedFaqs() {

@@ -20,6 +20,10 @@ import {
 
 type Props = { params: Promise<{ slug: string }> };
 
+// Rute ini membaca URL data (params) saat render. Dalam cacheComponents,
+// tandai sebagai blocking route agar tidak memaksa shell instant menunggu params.
+export const instant = false;
+
 // Value prop level klinik (bukan klaim hasil). Memakai pola "Kenapa memilih"
 // seperti halaman layanan klinik gigi pada umumnya — isinya berlaku untuk
 // seluruh layanan, bukan data spesifik per-baris, jadi tidak perlu kolom baru.

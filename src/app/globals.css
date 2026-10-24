@@ -164,6 +164,44 @@
 .rich-content strong {
   font-weight: 600;
 }
+/* Gambar dalam konten (node ImageFigure dari editor): responsif + alignment ala
+   WordPress + caption. Dipakai halaman artikel publik & pratinjau editor. */
+.rich-content figure {
+  margin: 1.6em 0;
+}
+.rich-content figure img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  margin-inline: auto;
+  border-radius: 1.25rem;
+}
+.rich-content figure[data-align="left"] {
+  float: left;
+  max-width: 45%;
+  margin: 0.2em 1.5rem 1rem 0;
+}
+.rich-content figure[data-align="right"] {
+  float: right;
+  max-width: 45%;
+  margin: 0.2em 0 1rem 1.5rem;
+}
+.rich-content figure[data-align="center"] img {
+  margin-inline: auto;
+}
+.rich-content figcaption {
+  margin-top: 0.6em;
+  font-size: var(--text-small);
+  line-height: 1.5;
+  text-align: center;
+  color: rgb(36 43 40 / 0.62);
+}
+/* Bersihkan float di akhir konten agar layout tidak rusak. */
+.rich-content::after {
+  content: "";
+  display: table;
+  clear: both;
+}
 .rich-content code {
   background-color: var(--color-sage);
   border-radius: var(--radius-site);
