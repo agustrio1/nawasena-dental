@@ -48,7 +48,7 @@ export default async function ServicesPage() {
                   alt={service.coverAlt ?? service.name}
                   width={640}
                   height={400}
-                  className="aspect-[16/10] w-full transition-transform duration-500 group-hover:scale-[1.04]"
+                  className="aspect-16/10 w-full transition-transform duration-500 group-hover:scale-[1.04]"
                 />
                 <div className="flex flex-1 flex-col p-6">
                   <h2 className="text-h3 text-forest">{service.name}</h2>

@@ -144,6 +144,154 @@ async function seedServices() {
         sortOrder: 3,
         status: "published",
       },
+      {
+        slug: "perawatan-gigi-berlubang",
+        name: "Tambal Gigi (Perawatan Gigi Berlubang)",
+        summary:
+          "Perawatan gigi berlubang untuk menghentikan kerusakan dan mengembalikan bentuk gigi.",
+        description:
+          "Penanganan karies dengan membersihkan bagian gigi yang rusak lalu menutupnya dengan bahan tambal yang sesuai. Jenis bahan dan teknik ditentukan dokter berdasarkan lokasi dan luas kerusakan.",
+        availabilityNote: "Tersedia pada jam layanan klinik",
+        consultReasons: [
+          "Gigi berlubang",
+          "Nyeri saat makan manis atau dingin",
+          "Ada lubang atau celah pada gigi",
+        ],
+        processSteps: [
+          "Pemeriksaan (rontgen bila perlu)",
+          "Pembersihan jaringan karies",
+          "Penambalan",
+          "Kontrol bila diperlukan",
+        ],
+        faqs: [
+          {
+            question: "Apakah menambal gigi sakit?",
+            answer:
+              "Umumnya dilakukan dengan bius lokal sesuai penilaian dokter agar proses lebih nyaman. Sensasi setiap pasien dapat berbeda.",
+          },
+        ],
+        sortOrder: 4,
+        status: "published",
+      },
+      {
+        slug: "perawatan-saluran-akar",
+        name: "Perawatan Saluran Akar",
+        summary:
+          "Perawatan untuk membantu menyelamatkan gigi yang saraf atau jaringannya meradang atau terinfeksi.",
+        description:
+          "Perawatan saluran akar membersihkan dan menutup saluran di dalam gigi yang mengalami peradangan atau infeksi, sesuai indikasi dokter. Tidak semua kasus dapat dipertahankan; sebagian memerlukan perawatan lanjutan seperti mahkota.",
+        availabilityNote:
+          "Konsultasi dengan dokter; beberapa kasus dapat dirujuk ke spesialis",
+        consultReasons: [
+          "Nyeri gigi hebat",
+          "Sensitivitas berkepanjangan",
+          "Gusi bengkak di sekitar gigi",
+        ],
+        processSteps: [
+          "Pemeriksaan & foto rontgen",
+          "Pembersihan saluran akar",
+          "Pengisian saluran",
+          "Restorasi lanjutan (mis. mahkota)",
+        ],
+        faqs: [
+          {
+            question: "Berapa kali kunjungan untuk perawatan saluran akar?",
+            answer:
+              "Bergantung kondisi gigi; dapat satu atau beberapa kunjungan sesuai penilaian dokter.",
+          },
+        ],
+        sortOrder: 5,
+        status: "published",
+      },
+      {
+        slug: "implan-gigi",
+        name: "Implan Gigi",
+        summary:
+          "Opsi pengganti gigi yang hilang melalui penanaman implan, bila kondisi tulang dan kesehatan mendukung.",
+        description:
+          "Implan gigi merupakan salah satu opsi pengganti gigi hilang. Kelayakan ditentukan melalui pemeriksaan, termasuk kondisi tulang rahang dan kesehatan umum pasien. Proses dan hasilnya bervariasi antar individu.",
+        availabilityNote:
+          "Menurut penilaian dokter; ketersediaan bergantung fasilitas dan kondisi pasien",
+        consultReasons: [
+          "Gigi hilang",
+          "Ingin pengganti tetap setelah pencabutan",
+          "Gangguan fungsi kunyah akibat gigi hilang",
+        ],
+        processSteps: [
+          "Konsultasi & pemeriksaan (rontgen bila perlu)",
+          "Perencanaan implan",
+          "Pemasangan implan",
+          "Pemasangan mahkota/abutment",
+        ],
+        faqs: [
+          {
+            question: "Apakah semua orang bisa memasang implan?",
+            answer:
+              "Tidak. Kelayakan bergantung kondisi tulang, kesehatan umum, dan penilaian dokter.",
+          },
+        ],
+        sortOrder: 6,
+        status: "published",
+      },
+      {
+        slug: "pemutihan-gigi",
+        name: "Pemutihan Gigi (Bleaching)",
+        summary:
+          "Perawatan estetika untuk membantu mencerahkan warna gigi, dengan hasil yang bervariasi pada tiap orang.",
+        description:
+          "Pemutihan gigi membantu mencerahkan warna gigi menggunakan bahan yang sesuai dan di bawah pengawasan dokter. Hasil bergantung kondisi awal gigi dan tidak bersifat permanen; sebagian gigi atau restorasi mungkin tidak berubah warna.",
+        availabilityNote:
+          "Tersedia setelah pemeriksaan; tidak dianjurkan untuk kondisi tertentu",
+        consultReasons: [
+          "Warna gigi tampak kusam",
+          "Noda permukaan tertentu",
+          "Ingin mencerahkan sebelum acara",
+        ],
+        processSteps: [
+          "Pemeriksaan & konsultasi",
+          "Persiapan gigi",
+          "Aplikasi bahan pemutih",
+          "Edukasi perawatan & pembatasan",
+        ],
+        faqs: [
+          {
+            question: "Apakah pemutihan cocok untuk semua orang?",
+            answer:
+              "Tidak selalu. Dokter menilai kondisi gigi dan gusi terlebih dahulu; sensitivitas dan hasil berbeda tiap pasien.",
+          },
+        ],
+        sortOrder: 7,
+        status: "published",
+      },
+      {
+        slug: "veneer-dan-restorasi-estetika",
+        name: "Veneer & Restorasi Estetika",
+        summary:
+          "Perawatan estetika untuk membantu memperbaiki bentuk, warna, atau susunan gigi depan.",
+        description:
+          "Veneer dan restorasi estetika membantu memperbaiki tampilan gigi depan, misalnya bentuk atau warna. Perencanaan mempertimbangkan fungsi gigitan dan kondisi gigi; hasil bervariasi dan memerlukan penilaian dokter.",
+        availabilityNote: "Konsultasi dengan dokter; tergantung kondisi gigi",
+        consultReasons: [
+          "Bentuk gigi depan ingin diperbaiki",
+          "Warna atau retak ringan",
+          "Jarak antar gigi (diastema)",
+        ],
+        processSteps: [
+          "Konsultasi & perencanaan",
+          "Persiapan gigi",
+          "Pemasangan veneer/restorasi",
+          "Kontrol & penyesuaian",
+        ],
+        faqs: [
+          {
+            question: "Apakah veneer merusak gigi asli?",
+            answer:
+              "Sebagian kasus memerlukan pengikisan email tipis. Dokter menjelaskan pilihan dan risikonya sebelum perawatan dimulai.",
+          },
+        ],
+        sortOrder: 8,
+        status: "published",
+      },
     ])
     .onConflictDoNothing({ target: services.slug });
 }
