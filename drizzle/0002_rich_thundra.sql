@@ -1,0 +1,1 @@
+ALTER TABLE "appointment_requests" ALTER COLUMN "whatsapp" DROP NOT NULL;
